@@ -4,18 +4,14 @@ import java.io.*;
 import java.net.*;
 import java.util.*;
 
-public class BackupServer extends ServerProcess {
+public class BackupServer extends ServerType {
     private HeartbeatSender heartbeatSender;
     private String monitorHost;
     private int monitorPort;
     private JsonMessageSerializer serializer;
     
     public BackupServer(int serverId, int port, String monitorHost, int monitorPort) {
-        this.serverId = serverId;
-        this.port = port;
-        this.monitorHost = monitorHost;
-        this.monitorPort = monitorPort;
-        this.serializer = new JsonMessageSerializer();
+    	super(serverId, port, monitorHost, monitorPort);
         this.heartbeatSender = new HeartbeatSender(monitorHost, monitorPort, serverId, ()->System.out.println("Backup server didn't recieve HEARTBEAT_ACK"));
     }
     
