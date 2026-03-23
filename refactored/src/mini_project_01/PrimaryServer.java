@@ -5,18 +5,11 @@ import java.net.*;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class PrimaryServer extends ServerProcess {
+public class PrimaryServer extends ServerType {
     private Set<Integer> activeClients; // Track active client connections
-    private HeartbeatSender heartbeatSender;
-    private String monitorHost;
-    private int monitorPort;
-    private JsonMessageSerializer serializer;
-
+    
     public PrimaryServer(int serverId, int port, String monitorHost, int monitorPort) {
-        this.serverId = serverId;
-        this.port = port;
-        this.monitorHost = monitorHost;
-        this.monitorPort = monitorPort;
+    	super(serverId, port, monitorHost, monitorPort);
         this.activeClients = ConcurrentHashMap.newKeySet();
         this.serializer = new JsonMessageSerializer();
         this.heartbeatSender = new HeartbeatSender(monitorHost, monitorPort, serverId, this::onHeartbeatAckFail);
