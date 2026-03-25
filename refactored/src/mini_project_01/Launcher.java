@@ -10,6 +10,11 @@ import java.util.Scanner;
  * Starts the Monitor, 3 server instances, and the Admin GUI
  * so the entire system can be tested from a single run.
  * 
+ * Observer pattern integration (Gurjas):
+ *   After obtaining the Monitor singleton, the launcher registers
+ *   Observer instances (ServerNotifier, EventLogger) so they receive
+ *   event notifications throughout the system's lifecycle.
+ * 
  * Usage:
  *   java mini_project_01.Launcher
  * 
@@ -30,14 +35,29 @@ public class Launcher {
     public static void main(String[] args) {
         System.out.println("╔══════════════════════════════════════════════════╗");
         System.out.println("║   SRMS — Server Redundancy Management System    ║");
-        System.out.println("║   COMP 370 Mini Project 1                       ║");
+        System.out.println("║   COMP 370 Mini Project 2                       ║");
         System.out.println("╚══════════════════════════════════════════════════╝");
         System.out.println();
 
         try {
-            // ── Step 1: Start the Monitor ───────────────────────────────
+            // ── Step 1: Start the Monitor (Singleton) ───────────────────
             Monitor monitor = Monitor.getInstance();
             System.out.println("[MAIN] Starting Monitor on port " + monitor.getPort() + "...");
+
+            // ── Step 1b: Register Observers (Observer Pattern — Gurjas) ─
+            // ServerNotifier handles sending NEWPRIMARY messages to backups
+            // during failover. This logic was previously hard-coded inside
+            // Monitor.triggerFailover() — now it's decoupled.
+            ServerNotifier serverNotifier = new ServerNotifier(monitor);
+            monitor.addObserver(serverNotifier);
+            System.out.println("[MAIN] ServerNotifier observer registered.");
+
+            // EventLogger demonstrates extensibility — a new listener added
+            // with zero changes to Monitor.
+            EventLogger eventLogger = new EventLogger();
+            monitor.addObserver(eventLogger);
+            System.out.println("[MAIN] EventLogger observer registered.");
+
             monitor.start();
             System.out.println("[MAIN] Monitor started successfully.");
             Thread.sleep(1000); // Give it a moment to bind
@@ -101,6 +121,7 @@ public class Launcher {
             System.out.println("[MAIN] Server 1 (Primary): " + HOST + ":" + SERVER1_PORT);
             System.out.println("[MAIN] Server 2 (Backup):   " + HOST + ":" + SERVER2_PORT);
             System.out.println("[MAIN] Server 3 (Backup):   " + HOST + ":" + SERVER3_PORT);
+            System.out.println("[MAIN] Observers: ServerNotifier, EventLogger");
             System.out.println();
 
             // ── Step 6: Launch Admin GUI ────────────────────────────────
