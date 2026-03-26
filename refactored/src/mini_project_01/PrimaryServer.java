@@ -11,7 +11,6 @@ public class PrimaryServer extends ServerType {
     public PrimaryServer(int serverId, int port, String monitorHost, int monitorPort) {
     	super(serverId, port, monitorHost, monitorPort);
         this.activeClients = ConcurrentHashMap.newKeySet();
-        this.serializer = new JsonMessageSerializer();
         this.heartbeatSender = new HeartbeatSender(monitorHost, monitorPort, serverId, this::onHeartbeatAckFail);
     }
 
